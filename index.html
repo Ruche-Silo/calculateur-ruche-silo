@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Calculateur Cotisations - La Ruche & Le Silo</title>
     <style>
         :root {
@@ -11,7 +11,7 @@
             --card-bg: #343442;
             --text-color: #f0f0f0;
             --text-muted: #b0b0ba;
-            --accent-yellow: #fcea04;
+            --accent-yellow: #f1c40f;
             --accent-yellow-hover: #d4ac0d;
             --input-bg: #3b3b4a;
             --border-color: #4a4a5a;
@@ -19,34 +19,38 @@
             --remove-red-hover: #c0392b;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--bg-color); 
             margin: 0; 
-            padding: 20px; 
+            padding: 12px; 
             color: var(--text-color); 
         }
 
         .container { 
-            max-width: 750px; 
+            max-width: 650px; 
             margin: 0 auto; 
             background: var(--container-bg); 
-            padding: 25px; 
+            padding: 16px; 
             border-radius: 12px; 
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); 
         }
 
-        /* En-tête : Logo et Titre */
+        /* En-tête */
         .header-title-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
         .header-title-container img {
-            width: 100px;
+            width: 70px;
             height: auto;
             border-radius: 6px;
             flex-shrink: 0;
@@ -54,77 +58,78 @@
 
         h1 { 
             color: var(--accent-yellow); 
-            font-size: 22px; 
+            font-size: 18px; 
             margin: 0; 
             text-align: left;
+            line-height: 1.2;
         }
 
         .form-group { 
-            margin-bottom: 18px; 
+            margin-bottom: 16px; 
         }
 
         label { 
             display: block; 
-            font-weight: bold; 
-            margin-bottom: 8px; 
-            color: var(--text-color);
-        }
-
-        select, input[type="number"], input[type="text"] { 
-            width: 100%; 
-            padding: 10px 12px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 6px; 
-            box-sizing: border-box; 
-            background-color: var(--input-bg);
+            font-weight: 600; 
+            margin-bottom: 6px; 
             color: var(--text-color);
             font-size: 14px;
         }
 
-        select:focus, input[type="number"]:focus, input[type="text"]:focus {
+        select, input[type="number"], input[type="date"] { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 16px; /* Évite le zoom auto iOS */
+        }
+
+        select:focus, input[type="number"]:focus, input[type="date"]:focus {
             outline: none;
             border-color: var(--accent-yellow);
         }
 
-        /* Bloc Adhérent */
+        /* Cartes Adhérents */
         .adherant-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 18px;
-            margin-bottom: 20px;
-            position: relative;
+            padding: 14px;
+            margin-bottom: 16px;
         }
 
         .adherant-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
             border-bottom: 1px solid var(--border-color);
         }
 
         .adherant-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             color: var(--accent-yellow);
         }
 
-        /* Style pour les lignes d'activités */
+        /* Lignes d'activités */
         .activite-item { 
             display: flex; 
-            gap: 10px; 
+            flex-wrap: wrap;
+            gap: 8px; 
             margin-bottom: 10px; 
             align-items: center; 
             background: #2b2b36;
-            padding: 8px 12px;
+            padding: 10px;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: 8px;
         }
 
         .activite-item input[type="number"] { 
-            flex: 1; 
+            flex: 1 1 140px; 
         }
 
         .remise-label { 
@@ -136,10 +141,12 @@
             cursor: pointer;
             user-select: none;
             color: var(--text-muted);
+            padding: 4px 0;
         }
 
         .remise-label input[type="checkbox"] { 
-            width: auto; 
+            width: 18px; 
+            height: 18px;
             cursor: pointer;
             accent-color: var(--accent-yellow);
         }
@@ -149,12 +156,12 @@
             background-color: var(--accent-yellow); 
             color: #1e1e24; 
             border: none; 
-            border-radius: 6px; 
-            padding: 12px 15px; 
+            border-radius: 8px; 
+            padding: 14px; 
             cursor: pointer; 
             font-weight: bold; 
             width: 100%; 
-            margin-top: 10px; 
+            margin-top: 8px; 
             transition: background-color 0.2s ease;
             font-size: 15px;
         }
@@ -167,78 +174,80 @@
             background-color: transparent;
             color: var(--accent-yellow);
             border: 1px dashed var(--accent-yellow);
-            border-radius: 6px;
-            padding: 8px 12px;
+            border-radius: 8px;
+            padding: 10px;
             cursor: pointer;
             font-weight: bold;
             width: 100%;
-            margin-top: 5px;
-            transition: all 0.2s ease;
-        }
-
-        .btn-add-sub:hover {
-            background-color: rgba(241, 196, 15, 0.1);
+            margin-top: 4px;
+            font-size: 14px;
         }
 
         .btn-remove { 
             background-color: var(--remove-red); 
             color: white; 
             border: none; 
-            border-radius: 5px; 
-            padding: 6px 10px; 
+            border-radius: 6px; 
+            padding: 8px 12px; 
             cursor: pointer; 
             font-weight: bold; 
-            transition: background-color 0.2s ease;
             font-size: 13px;
         }
 
-        .btn-remove:hover { 
-            background-color: var(--remove-red-hover); 
-        }
-
-        /* Bloc Résultats */
+        /* Résumé */
         .results { 
             background: #23232d; 
             border: 1px solid var(--border-color); 
             border-radius: 8px; 
-            padding: 18px; 
-            margin-top: 25px; 
+            padding: 16px; 
+            margin-top: 20px; 
         }
 
         .results h2 { 
             margin-top: 0; 
             color: var(--accent-yellow); 
-            font-size: 18px; 
+            font-size: 16px; 
         }
 
         .price-line { 
             display: flex; 
             justify-content: space-between; 
-            margin-bottom: 10px; 
-            font-size: 15px;
+            margin-bottom: 8px; 
+            font-size: 14px;
         }
 
         hr {
             border: none;
             border-top: 1px solid var(--border-color);
-            margin: 12px 0;
+            margin: 10px 0;
         }
 
         .total { 
-            font-size: 20px; 
+            font-size: 18px; 
             font-weight: bold; 
             color: var(--accent-yellow); 
-            padding-top: 5px; 
         }
 
         .echeancier { 
-            font-size: 14px; 
-            color: var(--text-muted); 
+            font-size: 13px; 
+            color: var(--text-color); 
             background: var(--input-bg); 
-            padding: 10px 12px; 
-            border-radius: 5px; 
+            padding: 12px; 
+            border-radius: 6px; 
             margin-top: 12px; 
             border: 1px solid var(--border-color);
+            line-height: 1.5;
+        }
+
+        .echeancier ul {
+            margin: 6px 0 0 0;
+            padding-left: 20px;
+        }
+
+        @media (min-width: 480px) {
+            .header-title-container img { width: 90px; }
+            h1 { font-size: 20px; }
+            .container { padding: 24px; }
         }
     </style>
 </head>
@@ -269,7 +278,7 @@
 
     <button type="button" class="btn-add-main" onclick="ajouterAdherant()">➕ Ajouter un adhérent / membre</button>
 
-    <div class="form-group" style="margin-top: 25px;">
+    <div class="form-group" style="margin-top: 20px;">
         <label for="paiements">Nombre de versements :</label>
         <select id="paiements" onchange="calculerTotaux()">
             <option value="1">1 paiement (Comptant)</option>
@@ -289,8 +298,8 @@
         <div class="price-line total"><span>TOTAL À PAYER :</span><span id="res-total">0.00 €</span></div>
         
         <div id="echeancier-box" class="echeancier" style="display:none;">
-            <strong>Échéancier de paiement :</strong>
-            <div id="res-echeancier"></div>
+            <strong>📌 Détail de l'échéancier :</strong>
+            <ul id="res-echeancier-list"></ul>
         </div>
     </div>
 </div>
@@ -299,7 +308,6 @@
 const TOTAL_SEANCES_ANNEE = 30;
 let adherantCounter = 0;
 
-// Ajouter un bloc Adhérent
 function ajouterAdherant() {
     adherantCounter++;
     const container = document.getElementById('adherants-container');
@@ -307,23 +315,28 @@ function ajouterAdherant() {
     div.className = 'adherant-card';
     div.id = `adherant-${adherantCounter}`;
 
-    const canRemove = container.children.length > 0; // On ne permet pas de supprimer le premier s'il est seul
+    const canRemove = container.children.length > 0;
     
     div.innerHTML = `
         <div class="adherant-header">
             <span class="adherant-title">👤 Adhérent ${container.children.length + 1}</span>
-            ${canRemove ? `<button type="button" class="btn-remove" onclick="supprimerAdherant('${div.id}')">✕ Supprimer cet adhérent</button>` : ''}
+            ${canRemove ? `<button type="button" class="btn-remove" onclick="supprimerAdherant('${div.id}')">✕ Supprimer</button>` : ''}
         </div>
 
         <div class="form-group">
-            <label>Type d'adhésion (selon l'âge) :</label>
+            <label>Date de naissance (optionnel) :</label>
+            <input type="date" class="input-dob" onchange="ajusterAdhesionParAge(this)">
+        </div>
+
+        <div class="form-group">
+            <label>Type d'adhésion :</label>
             <select class="input-age" onchange="calculerTotaux()">
-                <option value="0">Exonéré</option>
-                <option value="0">0-2 ans : gratuite</option>
-                <option value="5">3-5 ans : 5€/an</option>
-                <option value="7">6-11 ans : 7€/an</option>
-                <option value="10">12-17 ans : 10€/an</option>
-                <option value="20" selected>18 ans et + : 20€/an</option>
+                <option value="0" data-type="exoneration">Exonéré</option>
+                <option value="0" data-type="0-2">0-2 ans : gratuite (0€)</option>
+                <option value="5" data-type="3-5">3-5 ans : 5€/an</option>
+                <option value="7" data-type="6-11">6-11 ans : 7€/an</option>
+                <option value="10" data-type="12-17">12-17 ans : 10€/an</option>
+                <option value="20" data-type="18+" selected>18 ans et + : 20€/an</option>
             </select>
         </div>
 
@@ -346,7 +359,46 @@ function ajouterAdherant() {
     calculerTotaux();
 }
 
-// Supprimer un bloc Adhérent
+function ajusterAdhesionParAge(inputDob) {
+    const dobValue = inputDob.value;
+    if (!dobValue) return;
+
+    const dob = new Date(dobValue);
+    const today = new Date();
+    
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+        age--;
+    }
+
+    const card = inputDob.closest('.adherant-card');
+    const selectAge = card.querySelector('.input-age');
+
+    let targetType = "18+";
+    if (age >= 0 && age <= 2) {
+        targetType = "0-2";
+    } else if (age >= 3 && age <= 5) {
+        targetType = "3-5";
+    } else if (age >= 6 && age <= 11) {
+        targetType = "6-11";
+    } else if (age >= 12 && age <= 17) {
+        targetType = "12-17";
+    } else {
+        targetType = "18+";
+    }
+
+    for (let option of selectAge.options) {
+        if (option.getAttribute('data-type') === targetType) {
+            selectAge.value = option.value;
+            option.selected = true;
+            break;
+        }
+    }
+
+    calculerTotaux();
+}
+
 function supprimerAdherant(id) {
     const el = document.getElementById(id);
     if (el) {
@@ -356,7 +408,6 @@ function supprimerAdherant(id) {
     }
 }
 
-// Mettre à jour les numéros d'affichage (Adhérent 1, Adhérent 2...)
 function renumeroterAdherants() {
     const cards = document.querySelectorAll('.adherant-card');
     cards.forEach((card, index) => {
@@ -365,7 +416,6 @@ function renumeroterAdherants() {
     });
 }
 
-// Ajouter une ligne d'activité à un adhérent
 function ajouterActivite(bouton) {
     const container = bouton.previousElementSibling;
     const div = document.createElement('div');
@@ -382,13 +432,11 @@ function ajouterActivite(bouton) {
     calculerTotaux();
 }
 
-// Supprimer une ligne d'activité
 function supprimerActivite(bouton) {
     bouton.parentElement.remove();
     calculerTotaux();
 }
 
-// Calcul global
 function calculerTotaux() {
     const ateliersRestants = parseInt(document.getElementById('mois').value) || TOTAL_SEANCES_ANNEE;
     const ratioDegressif = ateliersRestants / TOTAL_SEANCES_ANNEE;
@@ -400,13 +448,11 @@ function calculerTotaux() {
     let totalReductions = 0;
 
     cards.forEach(card => {
-        // 1. Adhésion
         const selectAge = card.querySelector('.input-age');
         if (selectAge) {
             totalAdhesions += parseFloat(selectAge.value) || 0;
         }
 
-        // 2. Activités de cet adhérent
         const itemsActivite = card.querySelectorAll('.activite-item');
         itemsActivite.forEach(item => {
             const inputPrix = item.querySelector('.input-activite');
@@ -428,31 +474,40 @@ function calculerTotaux() {
     let totalActivitesNet = totalActivitesBrutDegresse - totalReductions;
     let totalGeneral = totalAdhesions + totalActivitesNet;
 
-    // Affichage des résultats
     document.getElementById('res-nb-adherants').innerText = cards.length;
     document.getElementById('res-adhesion').innerText = totalAdhesions.toFixed(2) + " €";
     document.getElementById('res-activites').innerText = totalActivitesBrutDegresse.toFixed(2) + " €";
     document.getElementById('res-reduction').innerText = "-" + totalReductions.toFixed(2) + " €";
     document.getElementById('res-total').innerText = totalGeneral.toFixed(2) + " €";
 
-    // Échéancier
+    // Échéancier : Adhésions au 1er versement + versements suivants arrondis à l'euro entier
     const nbPaiements = parseInt(document.getElementById('paiements').value) || 1;
     const echeancierBox = document.getElementById('echeancier-box');
+    const echeancierList = document.getElementById('res-echeancier-list');
     
     if (nbPaiements > 1 && totalGeneral > 0) {
         echeancierBox.style.display = 'block';
-        let mensualite = (totalGeneral / nbPaiements).toFixed(2);
-        document.getElementById('res-echeancier').innerText = 
-            nbPaiements + " versements de " + mensualite + " €";
+        
+        let versementSuivantEntier = Math.round(totalActivitesNet / nbPaiements);
+        let totalVersementsSuivants = versementSuivantEntier * (nbPaiements - 1);
+        let premierVersement = totalAdhesions + (totalActivitesNet - totalVersementsSuivants);
+
+        let htmlEcheances = `<li><strong>1<sup>er</sup> versement :</strong> ${premierVersement.toFixed(2)} € <small style="color:var(--text-muted);">(Contient l'adhésion et l'ajustement des centimes)</small></li>`;
+        
+        if (nbPaiements === 2) {
+            htmlEcheances += `<li><strong>2<sup>e</sup> versement :</strong> ${versementSuivantEntier} € <small style="color:var(--text-muted);">(montant entier)</small></li>`;
+        } else {
+            htmlEcheances += `<li><strong>${nbPaiements - 1} versements suivants :</strong> ${versementSuivantEntier} € / versement <small style="color:var(--text-muted);">(montants entiers)</small></li>`;
+        }
+
+        echeancierList.innerHTML = htmlEcheances;
     } else {
         echeancierBox.style.display = 'none';
     }
 }
 
-// Initialisation avec un premier adhérent par défaut
 ajouterAdherant();
 </script>
 
 </body>
 </html>
-
