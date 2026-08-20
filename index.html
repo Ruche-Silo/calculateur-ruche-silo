@@ -18,8 +18,6 @@
             --remove-red: #e74c3c;
             --remove-red-hover: #c0392b;
             --success-green: #2ecc71;
-            --btn-blue: #3498db;
-            --btn-blue-hover: #2980b9;
         }
 
         body { 
@@ -207,8 +205,8 @@
         }
 
         .btn-copy {
-            background-color: var(--btn-blue);
-            color: white;
+            background-color: var(--accent-yellow);
+            color: #121212;
             border: none;
             padding: 8px 12px;
             border-radius: 6px;
@@ -222,11 +220,12 @@
         }
 
         .btn-copy:hover {
-            background-color: var(--btn-blue-hover);
+            background-color: var(--accent-yellow-hover);
         }
 
         .btn-copy.copied {
             background-color: var(--success-green);
+            color: white;
         }
 
         .summary-line {
@@ -281,8 +280,7 @@
     <div class="month-selector-box">
         <label for="mois-inscription">Mois d'inscription (Prorata) :</label>
         <select id="mois-inscription" onchange="calculerTotaux()">
-            <option value="30">Septembre (30 séances - Tarif plein)</option>
-            <option value="27">Octobre (27 séances)</option>
+            <option value="30">Septembre - Octobre (30 séances - Tarif plein)</option>
             <option value="24">Novembre (24 séances)</option>
             <option value="21">Décembre (21 séances)</option>
             <option value="18">Janvier (18 séances)</option>
@@ -397,156 +395,4 @@
 
     function ajouterActivite(adherentId) {
         const container = document.getElementById(`activities-container-${adherentId}`);
-        const actDiv = document.createElement('div');
-        actDiv.className = 'activity-item';
-        
-        actDiv.innerHTML = `
-            <input type="number" placeholder="Prix annuel brut (€)" class="input-prix-activite" min="0" step="any" oninput="calculerTotaux()">
-            <label class="checkbox-container">
-                <input type="checkbox" class="check-remise" onchange="calculerTotaux()"> Remise 20%
-            </label>
-            <button class="btn-remove" onclick="this.parentElement.remove(); calculerTotaux();">✕</button>
-        `;
-        
-        container.appendChild(actDiv);
-        calculerTotaux();
-    }
-
-    function calculerAgeAuto(adherentId, dateNaissanceStr) {
-        if (!dateNaissanceStr) return;
-        
-        const birthDate = new Date(dateNaissanceStr);
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const m = today.getMonth() - birthDate.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-
-        const select = document.getElementById(`adhesion-select-${adherentId}`);
-        if (age >= 18) select.value = "20";
-        else if (age >= 12) select.value = "10";
-        else if (age >= 6) select.value = "7";
-        else if (age >= 3) select.value = "5";
-        else select.value = "0";
-
-        calculerTotaux();
-    }
-
-    function calculerTotaux() {
-        const nbSeances = parseFloat(document.getElementById('mois-inscription').value);
-        const ratioDegressif = nbSeances / 30;
-
-        let totalAdhesions = 0;
-        let totalActivitesBrutDegresse = 0;
-        let totalReductions = 0;
-
-        document.querySelectorAll('.adherent-card').forEach(card => {
-            const selectAdhesion = card.querySelector('.select-adhesion');
-            if (selectAdhesion) {
-                const val = selectAdhesion.value;
-                if (val !== "0-ex") {
-                    totalAdhesions += parseFloat(val) || 0;
-                }
-            }
-
-            card.querySelectorAll('.activity-item').forEach(act => {
-                const inputPrix = act.querySelector('.input-prix-activite');
-                const checkRemise = act.querySelector('.check-remise');
-                
-                const valPrix = parseFloat(inputPrix.value);
-                if (!isNaN(valPrix) && valPrix > 0) {
-                    let prixDegresse = valPrix * ratioDegressif;
-                    totalActivitesBrutDegresse += prixDegresse;
-
-                    if (checkRemise && checkRemise.checked) {
-                        let montantRemise = prixDegresse * 0.20;
-                        totalReductions += montantRemise;
-                    }
-                }
-            });
-        });
-
-        let totalActivitesNet = totalActivitesBrutDegresse - totalReductions;
-        let totalGeneral = totalAdhesions + totalActivitesNet;
-
-        document.getElementById('res-adhesion').innerText = totalAdhesions.toFixed(2).replace('.', ',') + " €";
-        document.getElementById('res-activites').innerText = totalActivitesBrutDegresse.toFixed(2).replace('.', ',') + " €";
-        document.getElementById('res-reduction').innerText = "-" + totalReductions.toFixed(2).replace('.', ',') + " €";
-        document.getElementById('res-total').innerText = totalGeneral.toFixed(2).replace('.', ',') + " €";
-
-        // Gestion de l'échéancier arrondi à l'euro près
-        const nbPaiements = parseInt(document.getElementById('paiements').value) || 1;
-        const echeancierBox = document.getElementById('echeancier-box');
-        const echeancierDetails = document.getElementById('echeancier-details');
-        
-        if (nbPaiements > 1 && totalGeneral > 0) {
-            echeancierBox.style.display = 'block';
-            echeancierDetails.innerHTML = '';
-
-            let mensuelBase = Math.floor(totalActivitesNet / nbPaiements);
-            let soldeActivitesPremierVersement = totalActivitesNet - (mensuelBase * (nbPaiements - 1));
-            let premierVersement = totalAdhesions + soldeActivitesPremierVersement;
-
-            let html = `<div class="echeancier-item"><span>Chèque / Versement 1 :</span> <strong>${premierVersement.toFixed(2).replace('.', ',')} €</strong> <small>(Adhésion + Solde)</small></div>`;
-            
-            for (let i = 2; i <= nbPaiements; i++) {
-                html += `<div class="echeancier-item"><span>Chèque / Versement ${i} :</span> <strong>${mensuelBase.toFixed(2).replace('.', ',')} €</strong></div>`;
-            }
-            
-            echeancierDetails.innerHTML = html;
-        } else {
-            echeancierBox.style.display = 'none';
-        }
-    }
-
-    // Copie du texte pour Framaforms
-    function copierPourFramaforms() {
-        const totalAdhesion = document.getElementById('res-adhesion').innerText;
-        const totalActivites = document.getElementById('res-activites').innerText;
-        const totalReduction = document.getElementById('res-reduction').innerText;
-        const totalGeneral = document.getElementById('res-total').innerText;
-        
-        const moisSelect = document.getElementById('mois-inscription');
-        const moisTexte = moisSelect.options[moisSelect.selectedIndex].text;
-        
-        const nbPaiements = parseInt(document.getElementById('paiements').value) || 1;
-
-        let texteAcoppier = `--- RÉSUMÉ CALCULATEUR ---\n`;
-        texteAcoppier += `Mois : ${moisTexte}\n`;
-        texteAcoppier += `Adhésions : ${totalAdhesion}\n`;
-        texteAcoppier += `Activités (prorata inclus) : ${totalActivites}\n`;
-        texteAcoppier += `Réductions (20%) : ${totalReduction}\n`;
-        texteAcoppier += `TOTAL À PAYER : ${totalGeneral}\n`;
-
-        if (nbPaiements > 1) {
-            texteAcoppier += `\n--- ÉCHÉANCIER DE PAIEMENT (${nbPaiements}x) ---\n`;
-            const items = document.querySelectorAll('#echeancier-details .echeancier-item');
-            items.forEach((item, index) => {
-                const montant = item.querySelector('strong').innerText;
-                texteAcoppier += `Versement ${index + 1} : ${montant}\n`;
-            });
-        }
-
-        navigator.clipboard.writeText(texteAcoppier).then(() => {
-            const btn = document.getElementById('btn-copy');
-            btn.classList.add('copied');
-            btn.innerHTML = '✅ Copié !';
-            
-            setTimeout(() => {
-                btn.classList.remove('copied');
-                btn.innerHTML = '📋 Copier pour Framaforms';
-            }, 2000);
-        }).catch(err => {
-            alert("Erreur lors de la copie : " + err);
-        });
-    }
-
-    // Initialisation
-    window.onload = function() {
-        ajouterAdherent();
-    };
-</script>
-
-</body>
-</html>
+        const actDiv = document
